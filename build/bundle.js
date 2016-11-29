@@ -16677,10 +16677,14 @@ var _objects2 = _interopRequireDefault(_objects);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var canvas = document.getElementById('stage');
-canvas.width = window.innerWidth / 2;
+canvas.width = window.innerWidth / 3;
 canvas.height = window.innerHeight;
+
 var context = canvas.getContext('2d');
 context.fillStyle = 'black';
+
+var background = new Image();
+background.src = "http://i.imgur.com/yf6d9SX.jpg";
 
 var drawHelper = new _objects2.default(canvas);
 drawHelper.drawTitle();
@@ -16771,10 +16775,6 @@ var asteroid$ = _Rx2.default.Observable.interval(ASTEROID_INTERVAL).scan(functio
     return object;
 }, INITIAL_OBJECTS);
 
-// asteroid$.subscribe((x)=>{
-//   console.log(x);
-// })
-
 var object$ = ticker$.withLatestFrom(spaceship$, asteroid$, input_shoot$).scan(function (object, _ref3) {
     var _ref4 = _slicedToArray(_ref3, 4),
         ticker = _ref4[0],
@@ -16806,7 +16806,9 @@ var update = function update(_ref5) {
         object = _ref6[2];
 
     context.clearRect(0, 0, canvas.width, canvas.height);
-    context.fillRect(0, 0, canvas.width, canvas.height);
+
+    // context.fillRect(0, 0, canvas.width, canvas.height);
+    drawHelper.drawBackground();
     drawHelper.drawSpaceship(spaceship_position);
 
     object.asteroids.forEach(function (asteroid) {
@@ -16820,7 +16822,7 @@ var update = function update(_ref5) {
 var game = _Rx2.default.Observable.combineLatest(ticker$, spaceship$, object$).sample(_Rx2.default.Observable.interval(TICKER_INTERVAL)).subscribe(update);
 
 },{"./lib/objects":342,"rxjs/Rx":9}],342:[function(require,module,exports){
-'use strict';
+"use strict";
 
 var library = function library(canvas) {
     var context = canvas.getContext('2d');
@@ -16828,6 +16830,10 @@ var library = function library(canvas) {
     var CANVAS_WIDTH = canvas.width;
 
     var Images = {};
+
+    var drawBackground = function drawBackground() {
+        context.drawImage(Images["background"], 0, 0, Images["background"].width, Images["background"].height, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+    };
 
     var drawTitle = function drawTitle() {
         context.textAlign = 'center';
@@ -16903,9 +16909,12 @@ var library = function library(canvas) {
     }, {
         name: "bullet",
         url: "./images/bullet.png"
+    }, {
+        name: "background",
+        url: "./images/background.jpg"
     }]);
 
-    return { drawTitle: drawTitle, drawControls: drawControls, drawAuthor: drawAuthor, drawScore: drawScore, drawSpaceship: drawSpaceship, drawBullet: drawBullet, drawTest: drawTest, drawAsteroid: drawAsteroid, randomNumber: randomNumber };
+    return { drawBackground: drawBackground, drawTitle: drawTitle, drawControls: drawControls, drawAuthor: drawAuthor, drawScore: drawScore, drawSpaceship: drawSpaceship, drawBullet: drawBullet, drawTest: drawTest, drawAsteroid: drawAsteroid, randomNumber: randomNumber };
 };
 module.exports = library;
 

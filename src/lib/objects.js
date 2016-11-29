@@ -5,6 +5,10 @@ var library = function(canvas) {
 
     const Images = {};
 
+    var drawBackground = function() {
+        context.drawImage(Images["background"], 0, 0, Images["background"].width, Images["background"].height, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+    }
+
     var drawTitle = function() {
         context.textAlign = 'center';
         context.font = '24px Courier New';
@@ -80,9 +84,12 @@ var library = function(canvas) {
         },{
             name: "bullet",
             url: "./images/bullet.png"
+        },{
+            name: "background",
+            url: "./images/background.jpg"
         }
     ]);
 
-    return {drawTitle, drawControls, drawAuthor, drawScore, drawSpaceship, drawBullet, drawTest, drawAsteroid, randomNumber}
+    return {drawBackground, drawTitle, drawControls, drawAuthor, drawScore, drawSpaceship, drawBullet, drawTest, drawAsteroid, randomNumber}
 }
 module.exports = library;

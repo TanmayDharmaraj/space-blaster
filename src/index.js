@@ -2,11 +2,14 @@ import Rx from 'rxjs/Rx';
 import library from './lib/objects'
 
 const canvas = document.getElementById('stage');
-canvas.width = window.innerWidth / 2;
+canvas.width = window.innerWidth / 3;
 canvas.height = window.innerHeight;
+
 const context = canvas.getContext('2d');
 context.fillStyle = 'black';
 
+const background = new Image();
+background.src = "http://i.imgur.com/yf6d9SX.jpg";
 
 var drawHelper = new library(canvas)
 drawHelper.drawTitle();
@@ -100,10 +103,6 @@ const asteroid$ = Rx.Observable.interval(ASTEROID_INTERVAL)
   return object
 },INITIAL_OBJECTS)
 
-// asteroid$.subscribe((x)=>{
-//   console.log(x);
-// })
-
 const object$ = ticker$
     .withLatestFrom(spaceship$, asteroid$, input_shoot$)
     .scan((object, [ticker, spaceship, asteroid_object, shoot])=>{
@@ -126,8 +125,11 @@ const object$ = ticker$
     }, INITIAL_OBJECTS)
 
 var update = function([ticker, spaceship_position, object]) {
+
     context.clearRect(0, 0, canvas.width, canvas.height);
-    context.fillRect(0, 0, canvas.width, canvas.height);
+
+    // context.fillRect(0, 0, canvas.width, canvas.height);
+    drawHelper.drawBackground();
     drawHelper.drawSpaceship(spaceship_position);
 
     object.asteroids.forEach((asteroid) => drawHelper.drawAsteroid(asteroid.xposition, asteroid.yposition))
