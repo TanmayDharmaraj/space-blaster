@@ -40,18 +40,28 @@ var library = function(canvas) {
         }
     }
 
-    var drawBullet = function (xposition, yposition) {
+    var drawBullet = function(xposition, yposition) {
         //TODO: laser beam correction 35 and 55.. Need to correct this.
-        var val = xposition - ((Images["spaceship"].width / 2) - 35);
-        context.drawImage(Images["bullet"], val, yposition - Images["spaceship"].height - 55)
+        // var val = xposition - ((Images["spaceship"].width / 2) - 35);
+        // if (yposition == 67) {
+        //     console.log("drawing explosion at", val, yposition);
+        //     drawExplosion(val, yposition);
+        // }
+        context.drawImage(Images["bullet"], xposition, yposition)
     }
 
-    var drawTest = function (x, y) {
-      context.drawImage(Images["bullet"], x, y)
+    var drawExplosion = function(xposition, yposition) {
+        for (var i = 0; i < 16; i++) {
+            context.drawImage(Images["explosion"], i * 128, 0, 128, 128, xposition, yposition, 128, 128);
+        }
+    }
+
+    var drawTest = function(x, y) {
+        context.drawImage(Images["bullet"], x, y)
     }
 
     var drawAsteroid = function(xposition, yposition) {
-        context.drawImage(Images["asteroid"], xposition, yposition - Images["asteroid"].height);
+        context.drawImage(Images["asteroid"], xposition, yposition);
     }
 
     var randomNumber = function(bottom, top) {
@@ -74,22 +84,34 @@ var library = function(canvas) {
         }
     }
 
-    loadImages([
-        {
-            name: "spaceship",
-            url: "./images/alienblaster.png"
-        }, {
-            name: "asteroid",
-            url: "./images/asteroid.png"
-        },{
-            name: "bullet",
-            url: "./images/bullet.png"
-        },{
-            name: "background",
-            url: "./images/background.jpg"
-        }
-    ]);
+    loadImages([{
+        name: "spaceship",
+        url: "./images/alienblaster.png"
+    }, {
+        name: "asteroid",
+        url: "./images/asteroid.png"
+    }, {
+        name: "bullet",
+        url: "./images/bullet.png"
+    }, {
+        name: "background",
+        url: "./images/background.jpg"
+    }, {
+        name: "explosion",
+        url: "./images/explode.png"
+    }]);
 
-    return {drawBackground, drawTitle, drawControls, drawAuthor, drawScore, drawSpaceship, drawBullet, drawTest, drawAsteroid, randomNumber}
+    return {
+        drawBackground,
+        drawTitle,
+        drawControls,
+        drawAuthor,
+        drawScore,
+        drawSpaceship,
+        drawBullet,
+        drawTest,
+        drawAsteroid,
+        randomNumber
+    }
 }
 module.exports = library;
