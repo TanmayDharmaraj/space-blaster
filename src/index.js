@@ -37,6 +37,8 @@ const ASTEROID_SPEED = 240;
 const ASTEROID_WIDTH = 128;
 const ASTEROID_HEIGHT = 128;
 const INITIAL_OBJECTS = {
+    spaceshipx: (canvas.width / 2) - (SPACESHIP_WIDTH / 2),
+    spaceshipy: canvas.height - SPACESHIP_HEIGHT,
     asteroids: [],
     bullets: []
 }
@@ -54,15 +56,13 @@ const input$ = Rx.Observable.merge(Rx.Observable.fromEvent(document, 'keydown', 
 }), Rx.Observable.fromEvent(document, 'keyup', event => 0)).distinctUntilChanged();
 
 const input_shoot$ = Rx.Observable.merge(Rx.Observable.fromEvent(document, 'keydown', event => {
-        switch (event.keyCode) {
-            case CONTROLS.spacebar:
-                return 1;
-            default:
-                return 0;
-        }
-    }), Rx.Observable.fromEvent(document, 'keyup', event => 0))
-    .distinctUntilChanged()
-
+    switch (event.keyCode) {
+        case CONTROLS.spacebar:
+            return 1;
+        default:
+            return 0;
+    }
+}), Rx.Observable.fromEvent(document, 'keyup', event => 0)).distinctUntilChanged()
 
 const ticker$ = Rx.Observable
     .interval(TICKER_INTERVAL, Rx.Scheduler.requestAnimationFrame)
@@ -109,13 +109,17 @@ const object$ = ticker$
     .withLatestFrom(spaceship$, asteroid$, input_shoot$)
     .scan((object, [ticker, spaceship, asteroid_object, shoot]) => {
 
+        //calculate spaceship position
+        object.spaceshipx = spaceship - (SPACESHIP_WIDTH / 2);
+        object.spaceshipy = canvas.height - SPACESHIP_HEIGHT;
+
+        //add a bullet to the bullet array if we have shot.
         if (shoot == 1) {
             object.bullets.push({
                 xposition: spaceship - ((SPACESHIP_WIDTH / 2) - 35),
                 yposition: canvas.height - (SPACESHIP_HEIGHT + 50)
             })
         }
-
 
         let newBullets = object.bullets
             .filter((data) => (data.yposition > 0))
@@ -125,34 +129,46 @@ const object$ = ticker$
             });
 
         return {
+            spaceshipx: object.spaceshipx,
+            spaceshipy: object.spaceshipy,
             asteroids: asteroid_object.asteroids,
             bullets: newBullets
         };
     }, INITIAL_OBJECTS)
 
-var update = function([ticker, spaceship_position, object]) {
+var update = function([ticker, /*spaceship_position,*/ object]) {
     context.clearRect(0, 0, canvas.width, canvas.height);
 
     drawHelper.drawBackground();
-    drawHelper.drawSpaceship(spaceship_position);
+    drawHelper.drawSpaceship(object.spaceshipx, object.spaceshipy);
 
-    //checking collisions
+    //checking bullet and asteroid collisions
     object.bullets.forEach((bullet, bullet_index) => {
         object.asteroids.forEach((asteroid, asteroid_index) => {
             if (bullet.xposition > asteroid.xposition - ASTEROID_WIDTH / 2 &&
                 bullet.xposition < asteroid.xposition + ASTEROID_WIDTH / 2 &&
                 bullet.yposition > asteroid.yposition - ASTEROID_HEIGHT / 2 &&
-                bullet.yposition < asteroid.yposition + ASTEROID_HEIGHT / 2)
-            {
+                bullet.yposition < asteroid.yposition + ASTEROID_HEIGHT / 2) {
                 object.asteroids.splice(asteroid_index, 1);
                 object.bullets.splice(bullet_index, 1)
             }
         })
-    })
+    });
+
+    //TODO : checking asteroid and spaceship collisions
+    // if (bullet.xposition > asteroid.xposition - ASTEROID_WIDTH / 2 &&
+    //     bullet.xposition < asteroid.xposition + ASTEROID_WIDTH / 2 &&
+    //     bullet.yposition > asteroid.yposition - ASTEROID_HEIGHT / 2 &&
+    //     bullet.yposition < asteroid.yposition + ASTEROID_HEIGHT / 2) {
+    //     object.asteroids.splice(asteroid_index, 1);
+    //     object.bullets.splice(bullet_index, 1)
+    // }
+
+
     object.asteroids.forEach((asteroid) => drawHelper.drawAsteroid(asteroid.xposition, asteroid.yposition))
     object.bullets.forEach((bullet) => drawHelper.drawBullet(bullet.xposition, bullet.yposition));
 }
 
-var game = Rx.Observable.combineLatest(ticker$, spaceship$, object$)
+var game = Rx.Observable.combineLatest(ticker$, /*spaceship$,*/ object$)
     .sample(Rx.Observable.interval(TICKER_INTERVAL))
     .subscribe(update);

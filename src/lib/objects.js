@@ -4,7 +4,7 @@ var library = function(canvas) {
     const CANVAS_WIDTH = canvas.width;
 
     const Images = {};
-
+    
     var drawBackground = function() {
         context.drawImage(Images["background"], 0, 0, Images["background"].width, Images["background"].height, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
     }
@@ -32,21 +32,11 @@ var library = function(canvas) {
         context.fillText(score, BRICK_GAP, 16);
     }
 
-    var drawSpaceship = function(position) {
-        if (position) {
-            context.drawImage(Images["spaceship"], position - Images["spaceship"].width / 2, CANVAS_HEIGHT - Images["spaceship"].height);
-        } else {
-            context.drawImage(Images["spaceship"], CANVAS_WIDTH / 2 - Images["spaceship"].width / 2, CANVAS_HEIGHT - Images["spaceship"].height);
-        }
+    var drawSpaceship = function(xposition, yposition) {
+        context.drawImage(Images["spaceship"], xposition, yposition);
     }
 
     var drawBullet = function(xposition, yposition) {
-        //TODO: laser beam correction 35 and 55.. Need to correct this.
-        // var val = xposition - ((Images["spaceship"].width / 2) - 35);
-        // if (yposition == 67) {
-        //     console.log("drawing explosion at", val, yposition);
-        //     drawExplosion(val, yposition);
-        // }
         context.drawImage(Images["bullet"], xposition, yposition)
     }
 
