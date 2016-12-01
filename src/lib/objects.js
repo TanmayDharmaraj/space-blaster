@@ -2,9 +2,8 @@ var library = function(canvas) {
     const context = canvas.getContext('2d');
     const CANVAS_HEIGHT = canvas.height;
     const CANVAS_WIDTH = canvas.width;
-
     const Images = {};
-    
+
     var drawBackground = function() {
         context.drawImage(Images["background"], 0, 0, Images["background"].width, Images["background"].height, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
     }
@@ -41,13 +40,18 @@ var library = function(canvas) {
     }
 
     var drawExplosion = function(xposition, yposition) {
-        for (var i = 0; i < 16; i++) {
-            context.drawImage(Images["explosion"], i * 128, 0, 128, 128, xposition, yposition, 128, 128);
-        }
-    }
 
-    var drawTest = function(x, y) {
-        context.drawImage(Images["bullet"], x, y)
+        // Create sprite
+        return sprite({
+            context: context,
+            width: 2048,
+            height: 128,
+            image: Images["explosion"],
+            numberOfFrames: 16,
+            ticksPerFrame: 1,
+            x: xposition,
+            y: yposition
+        });
     }
 
     var drawAsteroid = function(xposition, yposition) {
@@ -56,6 +60,45 @@ var library = function(canvas) {
 
     var randomNumber = function(bottom, top) {
         return Math.floor(Math.random() * (1 + top - bottom)) + bottom;
+    }
+
+    var sprite = function(options) {
+
+        var that = {},
+            frameIndex = 0,
+            tickCount = 0,
+            ticksPerFrame = options.ticksPerFrame || 0,
+            numberOfFrames = options.numberOfFrames || 1;
+
+        that.context = options.context;
+        that.width = options.width;
+        that.height = options.height;
+        that.image = options.image;
+        that.x = options.x;
+        that.y = options.y;
+
+        that.update = function() {
+
+            tickCount += 1;
+
+            if (tickCount > ticksPerFrame) {
+                tickCount = 0;
+                // If the current frame index is in range
+                if (frameIndex < numberOfFrames - 1) {
+                    // Go to the next frame
+                    frameIndex += 1;
+                } else {
+                    //frameIndex = 0;
+                }
+            }
+        };
+
+        that.render = function() {
+            // Draw the animation
+            that.context.drawImage(that.image, frameIndex * that.width / numberOfFrames, 0, that.width / numberOfFrames, that.height, that.x, that.y, that.width / numberOfFrames, that.height);
+        };
+
+        return that;
     }
 
     var loadImages = function(list) {
@@ -74,22 +117,24 @@ var library = function(canvas) {
         }
     }
 
-    loadImages([{
-        name: "spaceship",
-        url: "./images/alienblaster.png"
-    }, {
-        name: "asteroid",
-        url: "./images/asteroid.png"
-    }, {
-        name: "bullet",
-        url: "./images/bullet.png"
-    }, {
-        name: "background",
-        url: "./images/background.jpg"
-    }, {
-        name: "explosion",
-        url: "./images/explode.png"
-    }]);
+    loadImages([
+        {
+            name: "spaceship",
+            url: "./images/alienblaster.png"
+        }, {
+            name: "asteroid",
+            url: "./images/asteroid.png"
+        }, {
+            name: "bullet",
+            url: "./images/bullet.png"
+        }, {
+            name: "background",
+            url: "./images/background.jpg"
+        }, {
+            name: "explosion",
+            url: "./images/explode.png"
+        }
+    ]);
 
     return {
         drawBackground,
@@ -99,9 +144,10 @@ var library = function(canvas) {
         drawScore,
         drawSpaceship,
         drawBullet,
-        drawTest,
         drawAsteroid,
-        randomNumber
+        randomNumber,
+        sprite,
+        drawExplosion
     }
 }
 module.exports = library;

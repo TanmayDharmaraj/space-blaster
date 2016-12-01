@@ -22,7 +22,7 @@ setTimeout(function() {
     drawHelper.drawSpaceship();
 }, 1000);
 
-const TICKER_INTERVAL = 17;
+const TICKER_INTERVAL = 24;
 const ASTEROID_INTERVAL = 500;
 const CONTROLS = {
     left: 37,
@@ -40,7 +40,8 @@ const INITIAL_OBJECTS = {
     spaceshipx: (canvas.width / 2) - (SPACESHIP_WIDTH / 2),
     spaceshipy: canvas.height - SPACESHIP_HEIGHT,
     asteroids: [],
-    bullets: []
+    bullets: [],
+    explosions: []
 }
 
 
@@ -132,11 +133,12 @@ const object$ = ticker$
             spaceshipx: object.spaceshipx,
             spaceshipy: object.spaceshipy,
             asteroids: asteroid_object.asteroids,
-            bullets: newBullets
+            bullets: newBullets,
+            explosions: object.explosions
         };
     }, INITIAL_OBJECTS)
 
-var update = function([ticker, /*spaceship_position,*/ object]) {
+var update = function([ticker, object]) {
     context.clearRect(0, 0, canvas.width, canvas.height);
 
     drawHelper.drawBackground();
@@ -150,25 +152,25 @@ var update = function([ticker, /*spaceship_position,*/ object]) {
                 bullet.yposition > asteroid.yposition - ASTEROID_HEIGHT / 2 &&
                 bullet.yposition < asteroid.yposition + ASTEROID_HEIGHT / 2) {
                 object.asteroids.splice(asteroid_index, 1);
-                object.bullets.splice(bullet_index, 1)
+                object.bullets.splice(bullet_index, 1);
+                object.explosions.push({currentFrame : 1, object: drawHelper.drawExplosion(asteroid.xposition, asteroid.yposition)})
             }
         })
     });
 
-    //TODO : checking asteroid and spaceship collisions
-    // if (bullet.xposition > asteroid.xposition - ASTEROID_WIDTH / 2 &&
-    //     bullet.xposition < asteroid.xposition + ASTEROID_WIDTH / 2 &&
-    //     bullet.yposition > asteroid.yposition - ASTEROID_HEIGHT / 2 &&
-    //     bullet.yposition < asteroid.yposition + ASTEROID_HEIGHT / 2) {
-    //     object.asteroids.splice(asteroid_index, 1);
-    //     object.bullets.splice(bullet_index, 1)
-    // }
-
+    var newExplosions = object.explosions
+    .filter((explosion) => explosion.currentFrame <= 16)
+    .forEach((explosion) => {
+      explosion.currentFrame++;
+      explosion.object.update();
+      explosion.object.render();
+    });
+    object.explosion = newExplosions;
 
     object.asteroids.forEach((asteroid) => drawHelper.drawAsteroid(asteroid.xposition, asteroid.yposition))
     object.bullets.forEach((bullet) => drawHelper.drawBullet(bullet.xposition, bullet.yposition));
 }
 
-var game = Rx.Observable.combineLatest(ticker$, /*spaceship$,*/ object$)
+var game = Rx.Observable.combineLatest(ticker$, object$)
     .sample(Rx.Observable.interval(TICKER_INTERVAL))
     .subscribe(update);
