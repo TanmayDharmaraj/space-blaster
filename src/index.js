@@ -8,8 +8,8 @@ canvas.height = window.innerHeight;
 const context = canvas.getContext('2d');
 context.fillStyle = 'black';
 
-const background = new Image();
-background.src = "http://i.imgur.com/yf6d9SX.jpg";
+// const background = new Image();
+// background.src = "http://i.imgur.com/yf6d9SX.jpg";
 
 var drawHelper = new library(canvas)
 drawHelper.drawTitle();
@@ -90,15 +90,13 @@ const spaceship$ = ticker$
 const asteroid$ = Rx.Observable.interval(ASTEROID_INTERVAL)
     .scan((object, prev) => {
         let newRandomAsteroidPosition = drawHelper.randomNumber(ASTEROID_WIDTH / 2, canvas.width - ASTEROID_WIDTH);
-        object.asteroids.push({
-            xposition: newRandomAsteroidPosition,
-            yposition: -1 - ASTEROID_HEIGHT
-        })
+        var newAsteroidAtRandomPosition = drawHelper.drawAsteroid(newRandomAsteroidPosition, -1 - ASTEROID_HEIGHT);
+        object.asteroids.push(newAsteroidAtRandomPosition)
 
         let newAsteroids = object.asteroids
-            .filter((data) => (data.yposition < canvas.height))
+            .filter((data) => (data.y < canvas.height))
             .map((data) => {
-                data.yposition = data.yposition + 50;
+                data.y = data.y + 50;
                 return data
             });
 
@@ -128,7 +126,6 @@ const object$ = ticker$
                 data.yposition = data.yposition - 50
                 return data;
             });
-
         return {
             spaceshipx: object.spaceshipx,
             spaceshipy: object.spaceshipy,
@@ -147,15 +144,20 @@ var update = function([ticker, object]) {
     //checking bullet and asteroid collisions
     object.bullets.forEach((bullet, bullet_index) => {
         object.asteroids.forEach((asteroid, asteroid_index) => {
-            if (bullet.xposition > asteroid.xposition - ASTEROID_WIDTH / 2 &&
-                bullet.xposition < asteroid.xposition + ASTEROID_WIDTH / 2 &&
-                bullet.yposition > asteroid.yposition - ASTEROID_HEIGHT / 2 &&
-                bullet.yposition < asteroid.yposition + ASTEROID_HEIGHT / 2) {
+            if (bullet.xposition > asteroid.x - ASTEROID_WIDTH / 2 &&
+                bullet.xposition < asteroid.x + ASTEROID_WIDTH / 2 &&
+                bullet.yposition > asteroid.y - ASTEROID_HEIGHT / 2 &&
+                bullet.yposition < asteroid.y + ASTEROID_HEIGHT / 2) {
                 object.asteroids.splice(asteroid_index, 1);
                 object.bullets.splice(bullet_index, 1);
-                object.explosions.push({currentFrame : 1, object: drawHelper.drawExplosion(asteroid.xposition, asteroid.yposition)})
+                object.explosions.push({currentFrame : 1, object: drawHelper.drawExplosion(asteroid.x, asteroid.y)})
             }
         })
+    });
+
+    object.asteroids.forEach((asteroid) => {
+        asteroid.update();
+        asteroid.render();
     });
 
     var newExplosions = object.explosions
@@ -167,7 +169,6 @@ var update = function([ticker, object]) {
     });
     object.explosion = newExplosions;
 
-    object.asteroids.forEach((asteroid) => drawHelper.drawAsteroid(asteroid.xposition, asteroid.yposition))
     object.bullets.forEach((bullet) => drawHelper.drawBullet(bullet.xposition, bullet.yposition));
 }
 

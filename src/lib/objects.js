@@ -40,22 +40,33 @@ var library = function(canvas) {
     }
 
     var drawExplosion = function(xposition, yposition) {
-
-        // Create sprite
         return sprite({
             context: context,
             width: 2048,
             height: 128,
             image: Images["explosion"],
             numberOfFrames: 16,
+            numberOfRows: 1,
             ticksPerFrame: 1,
             x: xposition,
-            y: yposition
+            y: yposition,
+            loop: false
         });
     }
 
     var drawAsteroid = function(xposition, yposition) {
-        context.drawImage(Images["asteroid"], xposition, yposition);
+        return sprite({
+            context: context,
+            width: 1024,
+            height: 1024,
+            image: Images["asteroid"],
+            numberOfFrames: 8,
+            numberOfRows: 8,
+            ticksPerFrame: 1,
+            x: xposition,
+            y: yposition,
+            loop: true
+        });
     }
 
     var randomNumber = function(bottom, top) {
@@ -66,9 +77,11 @@ var library = function(canvas) {
 
         var that = {},
             frameIndex = 0,
+            rowIndex = 0,
             tickCount = 0,
             ticksPerFrame = options.ticksPerFrame || 0,
-            numberOfFrames = options.numberOfFrames || 1;
+            numberOfFrames = options.numberOfFrames || 1,
+            numberOfRows = options.numberOfRows || 1;
 
         that.context = options.context;
         that.width = options.width;
@@ -76,28 +89,44 @@ var library = function(canvas) {
         that.image = options.image;
         that.x = options.x;
         that.y = options.y;
+        that.loop = options.loop || false;
 
         that.update = function() {
-
             tickCount += 1;
-
             if (tickCount > ticksPerFrame) {
                 tickCount = 0;
-                // If the current frame index is in range
-                if (frameIndex < numberOfFrames - 1) {
-                    // Go to the next frame
-                    frameIndex += 1;
+                if (rowIndex < numberOfRows) {
+                    // If the current frame index is in range
+                    if (frameIndex < numberOfFrames - 1) {
+                        // Go to the next frame
+                        frameIndex += 1;
+                    } else if (that.loop) {
+                        if (rowIndex < numberOfRows - 1) {
+                            frameIndex = 0;
+                            rowIndex += 1
+                        } else {
+                            frameIndex = 0;
+                            rowIndex = 0
+                        }
+                    }
                 } else {
-                    //frameIndex = 0;
+                    rowIndex = 0;
                 }
             }
         };
 
         that.render = function() {
-            // Draw the animation
-            that.context.drawImage(that.image, frameIndex * that.width / numberOfFrames, 0, that.width / numberOfFrames, that.height, that.x, that.y, that.width / numberOfFrames, that.height);
-        };
+            var sx = frameIndex * that.width / numberOfFrames;
+            var sy = rowIndex * that.height / numberOfRows;
+            var sWidth = that.width / numberOfFrames;
+            var sHeight = that.height / numberOfRows;
+            var dx = that.x;
+            var dy = that.y;
+            var dWidth = that.width / numberOfFrames;
+            var dHeight = that.height / numberOfRows;
 
+            that.context.drawImage(that.image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
+        };
         return that;
     }
 
@@ -123,7 +152,7 @@ var library = function(canvas) {
             url: "./images/alienblaster.png"
         }, {
             name: "asteroid",
-            url: "./images/asteroid.png"
+            url: "./images/asteroid2.png"
         }, {
             name: "bullet",
             url: "./images/bullet.png"
