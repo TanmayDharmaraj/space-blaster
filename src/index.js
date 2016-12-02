@@ -41,7 +41,8 @@ const INITIAL_OBJECTS = {
     spaceshipy: canvas.height - SPACESHIP_HEIGHT,
     asteroids: [],
     bullets: [],
-    explosions: []
+    explosions: [],
+    score: 0
 }
 
 
@@ -131,7 +132,8 @@ const object$ = ticker$
             spaceshipy: object.spaceshipy,
             asteroids: asteroid_object.asteroids,
             bullets: newBullets,
-            explosions: object.explosions
+            explosions: object.explosions,
+            score : object.score
         };
     }, INITIAL_OBJECTS)
 
@@ -150,11 +152,12 @@ var update = function([ticker, object]) {
                 bullet.yposition < asteroid.y + ASTEROID_HEIGHT / 2) {
                 object.asteroids.splice(asteroid_index, 1);
                 object.bullets.splice(bullet_index, 1);
+                object.score++
                 object.explosions.push({currentFrame : 1, object: drawHelper.drawExplosion(asteroid.x, asteroid.y)})
             }
         })
     });
-
+    drawHelper.drawScore(object.score);
     object.asteroids.forEach((asteroid) => {
         asteroid.update();
         asteroid.render();

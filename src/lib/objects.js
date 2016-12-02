@@ -27,8 +27,9 @@ var library = function(canvas) {
     }
     var drawScore = function(score) {
         context.textAlign = 'left';
-        context.font = '16px Courier New';
-        context.fillText(score, BRICK_GAP, 16);
+        context.font = '18px Courier New';
+       context.fillStyle= 'white';
+        context.fillText(score, 10, 16);
     }
 
     var drawSpaceship = function(xposition, yposition) {
