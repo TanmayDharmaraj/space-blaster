@@ -20,21 +20,20 @@ var library = function(canvas) {
         context.fillText('press [<] and [>] to play', canvas.width / 2, canvas.height / 2);
     }
     var drawGameOver = function(score) {
-        context.clearRect(canvas.width / 4, canvas.height / 3, canvas.width /2, canvas.height / 3);
+        context.clearRect(canvas.width / 4, canvas.height / 3, canvas.width / 2, canvas.height / 3);
         context.textAlign = 'center';
         context.font = '16px Courier New';
-        context.fillStyle= 'black';
+        context.fillStyle = 'black';
         context.fillText('Game Over', canvas.width / 2, canvas.height / 2 - 48);
         context.fillText('Score : ' + score, canvas.width / 2, canvas.height / 2 - 16);
         if (typeof(Storage) !== "undefined") {
-          var previousHighScore = localStorage.getItem("highscore");
-          if(previousHighScore < score){
-              localStorage.setItem("highscore", score)
-              context.fillText('New high score!', canvas.width / 2, canvas.height / 2 + 16);
-          }
-          else{
-            context.fillText('High Score : ' + previousHighScore, canvas.width / 2, canvas.height / 2 + 16);
-          }
+            var previousHighScore = localStorage.getItem("highscore");
+            if (previousHighScore < score) {
+                localStorage.setItem("highscore", score)
+                context.fillText('New high score!', canvas.width / 2, canvas.height / 2 + 16);
+            } else {
+                context.fillText('High Score : ' + previousHighScore, canvas.width / 2, canvas.height / 2 + 16);
+            }
         }
         context.fillStyle = "#4285F4"
         context.fillText('[F5] To Restart', canvas.width / 2, canvas.height / 2 + 64);
@@ -49,7 +48,7 @@ var library = function(canvas) {
     var drawScore = function(score) {
         context.textAlign = 'left';
         context.font = '18px Courier New';
-        context.fillStyle= 'white';
+        context.fillStyle = 'white';
         context.fillText(score, 10, 16);
     }
 
