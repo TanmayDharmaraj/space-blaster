@@ -1,5 +1,5 @@
 # Space Blaster
-The most classic space game built using RxJs.
+The most classic space game built using RxJs. You can play the game [here](tanmaydharmaraj.github.io/space-blaster)
 
 ***Note:*** Game under development
 
