@@ -173,7 +173,7 @@ var library = function(canvas) {
             url: "./images/alienblaster.png"
         }, {
             name: "asteroid",
-            url: "./images/asteroid2.png"
+            url: "./images/asteroid3.png"
         }, {
             name: "bullet",
             url: "./images/bullet.png"
