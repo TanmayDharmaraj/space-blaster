@@ -1,8 +1,7 @@
 import Rx from 'rxjs/Rx';
-import library from './lib/objects'
+import library from './lib/helper'
 
 const canvas = document.getElementById('stage');
-canvas.focus();
 canvas.width = window.innerWidth / 3;
 
 //substract some account from the height to avoid browsers creating vertical scroll bars.
